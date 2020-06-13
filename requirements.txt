@@ -1,0 +1,16 @@
+django==3.0.4
+django_heroku
+djangorestframework
+django-filter  
+requests
+psycopg2
+pyyaml 
+uritemplate
+gunicorn
+dj_database_url
+markdown
+whitenoise
+python-dotenv
+Pillow
+django-cors-headers
+
