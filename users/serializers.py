@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Admin, ChefService, ChefParc, RespMaintencance, Conducteur
+from .models import User, Admin, RegionalUser, OperationnelUser, CentralUser
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -30,8 +30,8 @@ class AdminSign(APIView):
     permission_classes = [IsAuthenticated, AdminOnly]
 
     def post(self, request):
-        
-        #FOR DEBUG 
+
+        #FOR DEBUG
         print(request.headers)
         sys.stdout.flush()
         ###############
@@ -55,20 +55,19 @@ class UsersList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        
+
         #Parse request filters
         filters = {}
         if "user_type" in request.GET:
             if request.GET["user_type"] == "admin":
                 filters["user_type"] = 0
-            elif request.GET["user_type"] == "chefservice":
+            elif request.GET["user_type"] == "operationnel":
                 filters["user_type"] = 1
-            elif request.GET["user_type"] == "chefparc":
+            elif request.GET["user_type"] == "regional":
                 filters["user_type"] = 2
-            elif request.GET["user_type"] == "respmaintencance":
+            elif request.GET["user_type"] == "central":
                 filters["user_type"] = 3
-            elif request.GET["user_type"] == "conducteur":
-                filters["user_type"] = 4
+
 
         users = User.objects.filter(**filters)
         serializer = UserSerializer(users, many=True)

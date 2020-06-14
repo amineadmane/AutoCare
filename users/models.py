@@ -1,16 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_save 
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
 class User(AbstractUser):
     USER_TYPE_CHOICES = (
         (0, 'admin'),
-        (1, 'Chef de service'),
-        (2, 'Chef de parc'),
-        (3, 'Responsable de maintencance'),
-        (4, 'Conduteur'),
+        (1, 'Operationnel'),
+        (2, 'Regional'),
+        (3, 'Central'),
     )
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES)
     profile_id = models.IntegerField(default=0,blank=True,null=True)
@@ -20,36 +19,32 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
- 
+
 class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
-        
-class ChefService(models.Model):
+
+class OperationnelUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
 
-class ChefParc(models.Model):
+class RegionalUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
 
-class RespMaintencance(models.Model):
+class CentralUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
 
-class Conducteur(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.user.username
 
 
 
@@ -61,7 +56,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance=None, created=False, **kwargs):   
+def create_user_profile(sender, instance=None, created=False, **kwargs):
     if created:
         if(instance.user_type == 0):
             admin = Admin(user=instance)
