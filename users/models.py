@@ -64,22 +64,17 @@ def create_user_profile(sender, instance=None, created=False, **kwargs):
             instance.profile_id = admin.id
             instance.save()
         elif(instance.user_type == 1):
-            chefservice = ChefService(user=instance)
-            chefservice.save()
-            instance.profile_id = chefservice.id
+            operationnel = OperationnelUser(user=instance)
+            operationnel.save()
+            instance.profile_id = operationnel.id
             instance.save()
         elif(instance.user_type == 2):
-            chefparc = ChefParc(user=instance)
-            chefparc.save()
-            instance.profile_id = chefparc.id
+            regional = RegionalUser(user=instance)
+            regional.save()
+            instance.profile_id = regional.id
             instance.save()
         elif(instance.user_type == 3):
-            respmaintencance = RespMaintencance(user=instance)
-            respmaintencance.save()
-            instance.profile_id = respmaintencance.id
-            instance.save()
-        elif(instance.user_type == 4):
-            conducteur = Conducteur(user=instance)
-            conducteur.save()
-            instance.profile_id = conducteur.id
+            central = CentralUser(user=instance)
+            central.save()
+            instance.profile_id = central.id
             instance.save()
