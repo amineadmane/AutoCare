@@ -15,7 +15,23 @@ class User(AbstractUser):
     profile_id = models.IntegerField(default=0,blank=True,null=True)
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['user_type']
+    nss = models.IntegerField()
+    dateNaissance = models.DateField(auto_now=False, null=True, blank=True)
+    tel = models.CharField(max_length = 30, null=True, blank=True)
+    grade = models.CharField(max_length = 30, null=True, blank=True)
+    dateEmbauche = models.DateField(auto_now=False, null=True, blank=True)
+    REGION_CHOICES = (
+        (1, 'region-1'),
+        (2, 'region-2'),
+        (3, 'region-3'),
+        (4, 'region-4'),
+        (5, 'region-5'),
+        (6, 'region-6'),
 
+    )
+    region = models.PositiveSmallIntegerField(choices=REGION_CHOICES)
+    unite = models.CharField(max_length = 30, null=True, blank=True)
+    service = models.CharField(max_length = 30, null=True, blank=True)
 
     def __str__(self):
         return self.username

@@ -6,7 +6,8 @@ class UserSerializer(serializers.ModelSerializer):
     user_type = serializers.CharField(source='get_user_type_display')
     class Meta:
         model = User
-        fields = ['id', 'username', 'user_type', 'profile_id', 'first_name', 'last_name']
+        fields = ['id', 'username', 'user_type', 'profile_id', 'first_name', 'last_name',
+                  'nss','dateNaissance','tel','grade','dateEmbauche','region','unite','service']
 
 
 class SignUpSerializer(serializers.ModelSerializer):
