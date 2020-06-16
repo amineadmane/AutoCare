@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 
 from .models import Conducteur, Mission, Vehicule
 from .serializers import *
-
+from .permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
 
 
@@ -100,17 +100,22 @@ class MissionList(APIView):
     """
     List all Missions,Create new Mission
     """
+    
+    #The request is authenticated, or is a read-only request.
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, format=None):
         mission = Mission.objects.all()
-        serializer = MissionSerializer(mission, many=True)
+        serializer = MissionReadSerializer(mission, many=True)
         return Response(serializer.data)
 
     def post(self,request):
-
-        serializer=MissionSerializer(data=request.data)
+        data = request.data.copy()
+        data['redacteur'] = request.user.id
+        serializer=MissionWriteSerializer(data=data)
         if serializer.is_valid():
-          serializer.save()
+          mission = serializer.save()
+          serializer=MissionReadSerializer(mission)
           return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -128,5 +133,5 @@ class MissionDetail(APIView):
 
     def get(self, request, pk, format=None):
         mission = self.get_object(pk)
-        serializer = MissionSerializer(mission)
+        serializer = MissionReadSerializer(mission)
         return Response(serializer.data)
