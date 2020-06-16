@@ -52,7 +52,7 @@ class UsersList(APIView):
     """
     List all users , filter with user_type
     """
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
 
