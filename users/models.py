@@ -16,10 +16,10 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['user_type']
     nss = models.IntegerField()
-    dateNaissance = models.DateField(auto_now=False, null=True, blank=True)
+    dateNaissance = models.DateField(auto_now=False,auto_now_add=False,null=True, blank=True)
     tel = models.CharField(max_length = 30, null=True, blank=True)
     grade = models.CharField(max_length = 30, null=True, blank=True)
-    dateEmbauche = models.DateField(auto_now=False, null=True, blank=True)
+    dateEmbauche = models.DateField(auto_now=False,auto_now_add=False, null=True, blank=True)
     REGION_CHOICES = (
         (1, 'region-1'),
         (2, 'region-2'),
