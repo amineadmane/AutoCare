@@ -16,6 +16,11 @@ urlpatterns = [
     path('modele/<int:pk>/', ModeleDetail.as_view()),
 
 
+    #GET vehicule list , POST new vehicule
+    path('vehicule/', VehiculeList.as_view()),
+    #GET vehicule detail
+    path('vehicule/<int:pk>/', VehiculeDetail.as_view()),
+
     #GET conducteur list , POST new conducteur
     path('conducteur/', ConducteurList.as_view()),
     #GET conducteur detail
