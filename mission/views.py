@@ -15,10 +15,82 @@ from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework.views import APIView
 
-from .models import Conducteur, Mission, Vehicule
+from .models import Conducteur, Mission, Vehicule, Marque, Modele
 from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
+
+class MarqueList(APIView):
+    """
+    List all marques,Create new marque
+    """
+
+    def get(self, request, format=None):
+        marque = Marque.objects.all()
+        serializer = MarqueSerializer(marque, many=True)
+        return Response(serializer.data)
+
+    def post(self,request):
+
+        serializer=MarqueSerializer(data=request.data)
+        if serializer.is_valid():
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MarqueDetail(APIView):
+    """
+    Retrieve, update or delete a Marque instance.
+    """
+
+    def get_object(self, pk):
+        try:
+            marque = Marque.objects.get(pk=pk)
+            return marque
+        except Marque.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        marque = self.get_object(pk)
+        serializer = MarqueSerializer(marque)
+        return Response(serializer.data)
+
+
+class ModeleList(APIView):
+    """
+    List all Modeles,Create new Modele
+    """
+
+    def get(self, request, format=None):
+        modele = Modele.objects.all()
+        serializer = ModeleReadSerializer(modele, many=True)
+        return Response(serializer.data)
+
+    def post(self,request):
+
+        serializer=ModeleWriteSerializer(data=request.data)
+        if serializer.is_valid():
+          modele = serializer.save()
+          serializer=ModeleReadSerializer(modele)
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ModeleDetail(APIView):
+    """
+    Retrieve, update or delete a Modele instance.
+    """
+
+    def get_object(self, pk):
+        try:
+            modele = Modele.objects.get(pk=pk)
+            return modele
+        except Modele.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        modele = self.get_object(pk)
+        serializer = ModeleReadSerializer(modele)
+        return Response(serializer.data)
 
 
 class VehiculeList(APIView):
@@ -28,12 +100,12 @@ class VehiculeList(APIView):
 
     def get(self, request, format=None):
         vehicules = Vehicule.objects.all()
-        serializer = VehiculeSerializer(vehicules, many=True)
+        serializer = VehiculeReadSerializer(vehicules, many=True)
         return Response(serializer.data)
 
     def post(self,request):
 
-        serializer=VehiculeSerializer(data=request.data)
+        serializer=VehiculeWriteSerializer(data=request.data)
         if serializer.is_valid():
           serializer.save()
           return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -53,7 +125,7 @@ class VehiculeDetail(APIView):
 
     def get(self, request, pk, format=None):
         vehicule = self.get_object(pk)
-        serializer = VehiculeSerializer(vehicule)
+        serializer = VehiculeReadSerializer(vehicule)
         return Response(serializer.data)
 
 
