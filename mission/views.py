@@ -107,7 +107,8 @@ class VehiculeList(APIView):
 
         serializer=VehiculeWriteSerializer(data=request.data)
         if serializer.is_valid():
-          serializer.save()
+          vehicule = serializer.save()
+          serializer=VehiculeReadSerializer(vehicule)
           return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
