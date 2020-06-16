@@ -132,7 +132,4 @@ dmypy.json
 python3virtenv/
 **/__pycache__/
 .vscode/
-
-
-
 local-var.env
