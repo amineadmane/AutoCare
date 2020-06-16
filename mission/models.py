@@ -1,5 +1,5 @@
 from django.db import models
-
+from users.models import User
 # Create your models here.
 
 class Vehicule(models.Model):
@@ -68,6 +68,9 @@ class Conducteur(models.Model):
 
 
 class Mission(models.Model):
+    redacteur = models.ForeignKey(User,on_delete=models.CASCADE, null=False)
+    vehicule = models.ForeignKey(Vehicule,on_delete=models.CASCADE, null=False)
+    conducteur = models.ForeignKey(Conducteur,on_delete=models.CASCADE, null=False)
     point_depart = models.CharField(max_length = 30)
     point_arrive = models.CharField(max_length = 30)
     dateMission = models.DateField(auto_now=False,auto_now_add=False)
