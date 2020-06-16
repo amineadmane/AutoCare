@@ -28,4 +28,7 @@ urlpatterns = [
 
     #Users APP
     path('api/gestmission/', include('mission.urls')),
+
+    #Rapport APP
+    path('api/rapport/', include('rapport.urls')),
 ]
