@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'users',
     'mission',
     'rapport',
+    'revision',
+    'piece',
 
 ]
 
