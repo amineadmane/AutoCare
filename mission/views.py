@@ -98,14 +98,29 @@ class VehiculeList(APIView):
     List all vehicules,Create new vehicule
     """
 
+    #The request is authenticated
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
-        vehicules = Vehicule.objects.all()
+        #CentralUser get all vehicules
+        filter = {}
+        #RegionalUser get vehicules of his region
+        if request.user.user_type == 2:
+            filter['region'] = request.user.region
+        #OperationnelUser get vehicules of his region and his unite
+        if request.user.user_type == 1:
+            filter['region'] = request.user.region
+            filter['unite'] = request.user.unite
+
+        vehicules = Vehicule.objects.filter(**filter)
         serializer = VehiculeReadSerializer(vehicules, many=True)
         return Response(serializer.data)
 
     def post(self,request):
-
-        serializer=VehiculeWriteSerializer(data=request.data)
+        data = request.data.copy()
+        data['region'] = request.user.region
+        data['unite'] = request.user.unite
+        serializer=VehiculeWriteSerializer(data=data)
         if serializer.is_valid():
           vehicule = serializer.save()
           serializer=VehiculeReadSerializer(vehicule)
@@ -119,7 +134,16 @@ class VehiculeDetail(APIView):
 
     def get_object(self, pk):
         try:
-            vehicule = Vehicule.objects.get(pk=pk)
+            #CentralUser get all vehicules
+            filter = {}
+            #RegionalUser get vehicules of his region
+            if request.user.user_type == 2:
+                filter['region'] = request.user.region
+            #OperationnelUser get vehicules of his region and his unite
+            if request.user.user_type == 1:
+                filter['region'] = request.user.region
+                filter['unite'] = request.user.unite
+            vehicule = Vehicule.objects.get(pk=pk,**filter)
             return vehicule
         except Vehicule.DoesNotExist:
             raise Http404
@@ -130,20 +154,41 @@ class VehiculeDetail(APIView):
         return Response(serializer.data)
 
 
-
+            #CentralUser get all vehicules
+            filter = {}
+            #RegionalUser get vehicules of his region
+            if request.user.user_type == 2:
+                filter['region'] = request.user.region
+            #OperationnelUser get vehicules of his region and his unite
+            if request.user.user_type == 1:
+                filter['region'] = request.user.region
+                filter['unite'] = request.user.unite
 class ConducteurList(APIView):
     """
     List all conducteurs,Create new conducteur
     """
 
     def get(self, request, format=None):
-        conducteurs = Conducteur.objects.all()
+
+        #CentralUser get all vehicules
+        filter = {}
+        #RegionalUser get conducteurs of his region
+        if request.user.user_type == 2:
+            filter['region'] = request.user.region
+        #OperationnelUser get conducteurs of his region and his unite
+        if request.user.user_type == 1:
+            filter['region'] = request.user.region
+            filter['unite'] = request.user.unite
+
+        conducteurs = Conducteur.objects.filter(**filter)
         serializer = ConducteurSerializer(conducteurs, many=True)
         return Response(serializer.data)
 
     def post(self,request):
-
-        serializer=ConducteurSerializer(data=request.data)
+        data = request.data.copy()
+        data['region'] = request.user.region
+        data['unite'] = request.user.unite
+        serializer=ConducteurSerializer(data=data)
         if serializer.is_valid():
           serializer.save()
           return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -157,7 +202,16 @@ class ConducteurDetail(APIView):
 
     def get_object(self, pk):
         try:
-            conducteur = Conducteur.objects.get(pk=pk)
+            #CentralUser get all vehicules
+            filter = {}
+            #RegionalUser get vehicules of his region
+            if request.user.user_type == 2:
+                filter['region'] = request.user.region
+            #OperationnelUser get vehicules of his region and his unite
+            if request.user.user_type == 1:
+                filter['region'] = request.user.region
+                filter['unite'] = request.user.unite
+            conducteur = Conducteur.objects.get(pk=pk,**filter)
             return conducteur
         except Conducteur.DoesNotExist:
             raise Http404
@@ -173,6 +227,7 @@ class MissionList(APIView):
     """
     List all Missions,Create new Mission
     """
+
     
     #The request is authenticated, or is a read-only request.
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -185,7 +240,11 @@ class MissionList(APIView):
     def post(self,request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=MissionWriteSerializer(data=data)
+        serializer=MissionWriteSerializer(dataserializer.errors=data)
+        # vehicule = Vehicule.objects.get(pk=data['vehicule'])
+        # conducteur = Vehicule.objects.get(pk=data['conducteur'])
+        # if not (vehicule.region == request.user.region and vehicule.unite == request.user.unite and conducteur.region == request.user.region and conducteur.unite == request.user.unite):
+        #     return Response({"error": "vehicule ou conducteur n'ont pas la méme region/unite que l'utilisateur"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
           mission = serializer.save()
           serializer=MissionReadSerializer(mission)
