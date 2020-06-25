@@ -153,16 +153,6 @@ class VehiculeDetail(APIView):
         serializer = VehiculeReadSerializer(vehicule)
         return Response(serializer.data)
 
-
-            #CentralUser get all vehicules
-            filter = {}
-            #RegionalUser get vehicules of his region
-            if request.user.user_type == 2:
-                filter['region'] = request.user.region
-            #OperationnelUser get vehicules of his region and his unite
-            if request.user.user_type == 1:
-                filter['region'] = request.user.region
-                filter['unite'] = request.user.unite
 class ConducteurList(APIView):
     """
     List all conducteurs,Create new conducteur
@@ -240,7 +230,7 @@ class MissionList(APIView):
     def post(self,request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=MissionWriteSerializer(dataserializer.errors=data)
+        serializer=MissionWriteSerializer(data)
         # vehicule = Vehicule.objects.get(pk=data['vehicule'])
         # conducteur = Vehicule.objects.get(pk=data['conducteur'])
         # if not (vehicule.region == request.user.region and vehicule.unite == request.user.unite and conducteur.region == request.user.region and conducteur.unite == request.user.unite):
