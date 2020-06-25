@@ -61,6 +61,7 @@ class ModeleList(APIView):
     List all Modeles,Create new Modele
     """
 
+
     def get(self, request, format=None):
         modele = Modele.objects.all()
         serializer = ModeleReadSerializer(modele, many=True)
@@ -131,8 +132,10 @@ class VehiculeDetail(APIView):
     """
     Retrieve, update or delete a vehicule instance.
     """
+    #The request is authenticated
+    permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk):
+    def get_object(request,self, pk):
         try:
             #CentralUser get all vehicules
             filter = {}
@@ -149,7 +152,7 @@ class VehiculeDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        vehicule = self.get_object(pk)
+        vehicule = self.get_object(request,pk)
         serializer = VehiculeReadSerializer(vehicule)
         return Response(serializer.data)
 
@@ -157,6 +160,8 @@ class ConducteurList(APIView):
     """
     List all conducteurs,Create new conducteur
     """
+    #The request is authenticated
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
 
@@ -189,8 +194,9 @@ class ConducteurDetail(APIView):
     """
     Retrieve, update or delete a conducteur instance.
     """
-
-    def get_object(self, pk):
+    #The request is authenticated
+    permission_classes = [IsAuthenticated]
+    def get_object(self,request,pk):
         try:
             #CentralUser get all vehicules
             filter = {}
@@ -207,7 +213,7 @@ class ConducteurDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        conducteur = self.get_object(pk)
+        conducteur = self.get_object(request,pk)
         serializer = ConducteurSerializer(conducteur)
         return Response(serializer.data)
 

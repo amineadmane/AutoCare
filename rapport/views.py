@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework.views import APIView
-
+from mission.models import Conducteur, Vehicule
 from .models import RapportSignalProbleme, RapportSignalChauffeur, RapportSignalSinistre
 from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
@@ -79,6 +79,16 @@ class RapportSignalChauffeurList(APIView):
         if serializer.is_valid():
           rapport = serializer.save()
           serializer=RapportSignalChauffeur_ReadSerializer(rapport)
+          #reduce score of "chauffeur" depends on the "gravite"
+          if data['gravite'] == "FAIBLE":
+              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 5)
+          elif data['gravite'] == "MOYEN":
+              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 10)
+          elif data['gravite'] == "FORT":
+              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 20)
+          elif data['gravite'] == "CRITIQUE":
+              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 30)
+
           return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -125,7 +135,12 @@ class RapportSignalSinistreList(APIView):
         serializer=RapportSignalSinistre_WriteSerializer(data=data)
         if serializer.is_valid():
           rapport = serializer.save()
-          serializer = RapportSignalSinistre_ReadSerializer(rapport)          
+          serializer = RapportSignalSinistre_ReadSerializer(rapport)
+        
+          #critique ==> vehicule etat == hds
+          if data['gravite'] == "CRITIQUE":
+              Vehicule.objects.filter(pk=data['vehicule']).update(etat="HDS")
+
           return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -1,6 +1,10 @@
-from django.db import models
-from users.models import User
 # Create your models here.
+
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from users.models import User
 
 
 class Marque(models.Model):
@@ -63,6 +67,8 @@ class Vehicule(models.Model):
 
 
 
+
+
 class Conducteur(models.Model):
     nss = models.IntegerField()
     nom = models.CharField(max_length = 50)
@@ -83,7 +89,7 @@ class Conducteur(models.Model):
     region = models.PositiveSmallIntegerField(choices=REGION_CHOICES)
     unite = models.CharField(max_length = 30, null=True, blank=True)
     service = models.CharField(max_length = 30, null=True, blank=True)
-    SCORE_CHOICES = zip( range(1,101), range(1,101) )
+    SCORE_CHOICES = zip( range(0,101), range(0,101) )
     score = models.IntegerField(default=100,choices=SCORE_CHOICES)
     photo = models.CharField(max_length = 255, null=True, blank=True)
 
