@@ -78,7 +78,6 @@ class UserDetail(APIView):
     """
     Retrieve, update or delete a user instance.
     """
-    permission_classes = [OwnerOnly]
 
     def get_object(self, pk):
         try:
@@ -95,6 +94,10 @@ class UserDetail(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+    def delete(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

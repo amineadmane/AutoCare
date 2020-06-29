@@ -236,7 +236,7 @@ class MissionList(APIView):
     def post(self,request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=MissionWriteSerializer(data)
+        serializer=MissionWriteSerializer(data=data)
         # vehicule = Vehicule.objects.get(pk=data['vehicule'])
         # conducteur = Vehicule.objects.get(pk=data['conducteur'])
         # if not (vehicule.region == request.user.region and vehicule.unite == request.user.unite and conducteur.region == request.user.region and conducteur.unite == request.user.unite):

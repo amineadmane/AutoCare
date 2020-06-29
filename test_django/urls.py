@@ -31,4 +31,7 @@ urlpatterns = [
 
     #Rapport APP
     path('api/rapport/', include('rapport.urls')),
+
+    #Piece APP
+    path('api/gestpiece/', include('piece.urls')),
 ]

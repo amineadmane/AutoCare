@@ -3,7 +3,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.db.models import F
 from users.models import User
 
 
@@ -110,3 +110,12 @@ class Mission(models.Model):
     commentaire = models.TextField()
     heureDepart = models.TimeField(auto_now=False,auto_now_add=False)
     heureArrive = models.TimeField(auto_now=False,auto_now_add=False)
+
+
+
+
+
+@receiver(post_save, sender=Mission)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Vehicule.objects.filter(pk=instance.vehicule.pk).update(kilometrage=F('kilometrage') + instance.distance)
