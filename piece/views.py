@@ -27,7 +27,15 @@ class PieceList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, format=None):
-        pieces = Piece.objects.all()
+
+        #filtrage par modele 
+        filter = {}
+
+        if 'modele' in request.GET:
+            filter['modele'] = request.GET['modele']
+
+
+        pieces = Piece.objects.filter(**filter)
         serializer = PieceReadSerializer(pieces, many=True)
         return Response(serializer.data)
 
