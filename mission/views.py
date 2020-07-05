@@ -135,7 +135,7 @@ class VehiculeDetail(APIView):
     #The request is authenticated
     permission_classes = [IsAuthenticated]
 
-    def get_object(request,self, pk):
+    def get_object(self,request,pk):
         try:
             #CentralUser get all vehicules
             filter = {}
