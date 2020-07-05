@@ -14,8 +14,9 @@ class Piece (models.Model):
 class Guide_constructure(models.Model):
     observation = models.TextField(null=True, blank=True)
     piece = models.ForeignKey(Piece,  on_delete=models.CASCADE)
-
+    date = models.DateField(auto_now_add=True)
 
 class Guide_personnel(models.Model):
     observation = models.TextField(null=True, blank=True)
     piece = models.ForeignKey(Piece,  on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
