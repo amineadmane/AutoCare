@@ -52,7 +52,7 @@ class PieceDetail(APIView):
     Retrieve, update or delete a Piece instance.
     """
     #The request is authenticated, or is a read-only request.
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    #permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -65,6 +65,12 @@ class PieceDetail(APIView):
         piece = self.get_object(pk)
         serializer = PieceReadSerializer(piece)
         return Response(serializer.data)
+
+    def delete(self,request,pk):
+        piece=self.get_object(pk)
+        piece.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 
