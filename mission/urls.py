@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MarqueList,MarqueDetail,ModeleList,ModeleDetail,VehiculeList, ConducteurList, MissionList, VehiculeDetail, ConducteurDetail, MissionDetail
+from .views import MarqueList,pourcentage_vehicules_per_marque,pourcentage_vehicules_per_modele,pourcentage_conducteurs_per_score, MarqueDetail,ModeleList,ModeleDetail,VehiculeList, ConducteurList, MissionList, VehiculeDetail, ConducteurDetail, MissionDetail
 
 urlpatterns = [
 
@@ -32,6 +32,12 @@ urlpatterns = [
     #GET mission detail
     path('mission/<int:pk>/', MissionDetail.as_view()),
 
+
+    path('stats/conducteur/', pourcentage_conducteurs_per_score),
+
+    path('stats/vehicule/', pourcentage_vehicules_per_marque),
+
+    path('stats/vehicule/<int:marque>/', pourcentage_vehicules_per_modele),
 
    
 ]

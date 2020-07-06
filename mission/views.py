@@ -4,7 +4,7 @@ import sys
 import requests
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
-from django.db.models import F, Max, Sum
+from django.db.models import F, Max, Sum, Count
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
 from rest_framework import status
@@ -263,3 +263,38 @@ class MissionDetail(APIView):
         mission = self.get_object(pk)
         serializer = MissionReadSerializer(mission)
         return Response(serializer.data)
+
+
+@api_view(http_method_names=['GET'])
+def pourcentage_conducteurs_per_score(request):
+    nb_total_conducteurs = Conducteur.objects.count()
+    nb_bon = Conducteur.objects.filter(score__range=(65, 100)).count()
+    nb_moyen = Conducteur.objects.filter(score__range=(35, 65)).count()
+    nb_mauvais = Conducteur.objects.filter(score__range=(0, 35)).count()
+    stats = {}
+    stats['pourcentage_bon'] = nb_bon * 100 / nb_total_conducteurs 
+    stats['pourcentage_moyen'] = nb_moyen * 100 / nb_total_conducteurs
+    stats['pourcentage_mauvais'] = nb_mauvais * 100 / nb_total_conducteurs
+    
+    return Response(stats)
+
+
+@api_view(http_method_names=['GET'])
+def pourcentage_vehicules_per_marque(request):
+
+    total_modele = Vehicule.objects.count()
+    stats_modele = Vehicule.objects.values('modele__marque__id').annotate(modele_nom=F('modele__marque__nom'),nb=Count('*'))
+    for modele in stats_modele:
+        modele['pourcentage'] = modele['nb'] * 100 / total_modele
+
+    return Response(stats_modele)
+
+
+@api_view(http_method_names=['GET'])
+def pourcentage_vehicules_per_modele(request, marque):
+    total_modele = Vehicule.objects.filter(modele__marque=marque).count()
+    stats_modele = Vehicule.objects.filter(modele__marque=marque).values('modele__id').annotate(modele_nom=F('modele__nom'),nb=Count('*'))
+    for modele in stats_modele:
+        modele['pourcentage'] = modele['nb'] * 100 / total_modele
+
+    return Response(stats_modele)
