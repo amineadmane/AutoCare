@@ -223,7 +223,7 @@ class ConducteurDetail(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk):
-        conducteur = self.get_object(pk)
+        conducteur = self.get_object(request, pk)
         conducteur.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
