@@ -67,7 +67,7 @@ class PieceDetail(APIView):
         return Response(serializer.data)
 
     def delete(self,request,pk):
-        piece=self.get_object(self , pk)
+        piece=self.get_object(pk)
         piece.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
