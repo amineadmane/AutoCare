@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework.views import APIView
-
+from django.contrib.auth.decorators import login_required
 from .models import Conducteur, Mission, Vehicule, Marque, Modele
 from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
@@ -264,26 +264,51 @@ class MissionDetail(APIView):
         serializer = MissionReadSerializer(mission)
         return Response(serializer.data)
 
-
 @api_view(http_method_names=['GET'])
 def pourcentage_conducteurs_per_score(request):
-    nb_total_conducteurs = Conducteur.objects.count()
-    nb_bon = Conducteur.objects.filter(score__range=(65, 100)).count()
-    nb_moyen = Conducteur.objects.filter(score__range=(35, 65)).count()
-    nb_mauvais = Conducteur.objects.filter(score__range=(0, 35)).count()
-    stats = {}
-    stats['pourcentage_bon'] = nb_bon * 100 / nb_total_conducteurs 
-    stats['pourcentage_moyen'] = nb_moyen * 100 / nb_total_conducteurs
-    stats['pourcentage_mauvais'] = nb_mauvais * 100 / nb_total_conducteurs
     
+    if not request.user.is_authenticated:
+        return Response({'error':'login required'})
+    #CentralUser get all vehicules
+    filter = {}
+    #RegionalUser get conducteurs of his region
+    if request.user.user_type == 2:
+        filter['region'] = request.user.region
+    #OperationnelUser get conducteurs of his region and his unite
+    if request.user.user_type == 1:
+        filter['region'] = request.user.region
+        filter['unite'] = request.user.unite
+
+    
+    nb_total_conducteurs = Conducteur.objects.filter(**filter).count()
+    nb_bon = Conducteur.objects.filter(**filter).filter(score__range=(65, 100)).count()
+    nb_moyen = Conducteur.objects.filter(**filter).filter(score__range=(35, 65)).count()
+    nb_mauvais = Conducteur.objects.filter(**filter).filter(score__range=(0, 35)).count()
+    stats = {'pourcentage_bon':0,'pourcentage_moyen':0,'pourcentage_mauvais':0}
+    if nb_total_conducteurs != 0:
+        stats['pourcentage_bon'] = nb_bon * 100 / nb_total_conducteurs 
+        stats['pourcentage_moyen'] = nb_moyen * 100 / nb_total_conducteurs
+        stats['pourcentage_mauvais'] = nb_mauvais * 100 / nb_total_conducteurs
+        
     return Response(stats)
 
 
 @api_view(http_method_names=['GET'])
 def pourcentage_vehicules_per_marque(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'login required'})
+    #CentralUser get all vehicules
+    filter = {}
+    #RegionalUser get conducteurs of his region
+    if request.user.user_type == 2:
+        filter['region'] = request.user.region
+    #OperationnelUser get conducteurs of his region and his unite
+    if request.user.user_type == 1:
+        filter['region'] = request.user.region
+        filter['unite'] = request.user.unite
 
-    total_modele = Vehicule.objects.count()
-    stats_modele = Vehicule.objects.values('modele__marque__id').annotate(modele_nom=F('modele__marque__nom'),nb=Count('*'))
+    total_modele = Vehicule.objects.filter(**filter).count()
+    stats_modele = Vehicule.objects.filter(**filter).values('modele__marque__id').annotate(marque_nom=F('modele__marque__nom'),nb=Count('*'))
     for modele in stats_modele:
         modele['pourcentage'] = modele['nb'] * 100 / total_modele
 
@@ -292,9 +317,71 @@ def pourcentage_vehicules_per_marque(request):
 
 @api_view(http_method_names=['GET'])
 def pourcentage_vehicules_per_modele(request, marque):
-    total_modele = Vehicule.objects.filter(modele__marque=marque).count()
-    stats_modele = Vehicule.objects.filter(modele__marque=marque).values('modele__id').annotate(modele_nom=F('modele__nom'),nb=Count('*'))
+
+    if not request.user.is_authenticated:
+        return Response({'error':'login required'})
+    #CentralUser get all vehicules
+    filter = {}
+    #RegionalUser get conducteurs of his region
+    if request.user.user_type == 2:
+        filter['region'] = request.user.region
+    #OperationnelUser get conducteurs of his region and his unite
+    if request.user.user_type == 1:
+        filter['region'] = request.user.region
+        filter['unite'] = request.user.unite
+
+
+
+
+    total_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).count()
+    stats_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).values('modele__id').annotate(modele_nom=F('modele__nom'),nb=Count('*'))
     for modele in stats_modele:
         modele['pourcentage'] = modele['nb'] * 100 / total_modele
+
+    return Response(stats_modele)
+
+@api_view(http_method_names=['GET'])
+def stats_etat_vehicules(request):
+
+    if not request.user.is_authenticated:
+        return Response({'error':'login required'})
+    #CentralUser get all vehicules
+    filter = {}
+    #RegionalUser get conducteurs of his region
+    if request.user.user_type == 2:
+        filter['region'] = request.user.region
+    #OperationnelUser get conducteurs of his region and his unite
+    if request.user.user_type == 1:
+        filter['region'] = request.user.region
+        filter['unite'] = request.user.unite
+
+    total_modele = Vehicule.objects.filter(**filter).count()
+    stats_modele = Vehicule.objects.filter(**filter).values('modele__marque__id').annotate(marque_nom=F('modele__marque__nom'),nb=Count('*'))
+    for marque in stats_modele:
+        s = Vehicule.objects.filter(modele__marque=marque['modele__marque__id']).values('etat').annotate(nb=Count('etat'))
+        marque['etats'] = s
+
+    return Response(stats_modele)
+
+
+@api_view(http_method_names=['GET'])
+def stats_etat_vehicules_per_modele(request, marque):
+    if not request.user.is_authenticated:
+        return Response({'error':'login required'})
+    #CentralUser get all vehicules
+    filter = {}
+    #RegionalUser get conducteurs of his region
+    if request.user.user_type == 2:
+        filter['region'] = request.user.region
+    #OperationnelUser get conducteurs of his region and his unite
+    if request.user.user_type == 1:
+        filter['region'] = request.user.region
+        filter['unite'] = request.user.unite
+
+    total_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).count()
+    stats_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).values('modele__id').annotate(marque_nom=F('modele__nom'),nb=Count('*'))
+    for modele in stats_modele:
+        s = Vehicule.objects.filter(**filter).filter(modele=modele['modele__id']).values('etat').annotate(nb=Count('etat'))
+        modele['etats'] = s
 
     return Response(stats_modele)

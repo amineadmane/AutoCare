@@ -60,6 +60,47 @@ class RapportSignalProblemeDetail(APIView):
         return Response(serializer.data)
 
 
+class ValidateRapportSignalProbleme(APIView):
+
+    def get_object(self, pk):
+        try:
+            rapport = RapportSignalProbleme.objects.get(pk=pk)
+            return rapport
+        except RapportSignalProbleme.DoesNotExist:
+            raise Http404
+
+
+    def patch(self, request, pk, format=None):
+        data = {}
+        rapport = self.get_object(pk)
+        data['confirmed'] = True
+        serializer = RapportSignalProbleme_WriteSerializer(rapport, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class InValidateRapportSignalProbleme(APIView):
+
+    def get_object(self, pk):
+        try:
+            rapport = RapportSignalProbleme.objects.get(pk=pk)
+            return rapport
+        except RapportSignalProbleme.DoesNotExist:
+            raise Http404
+
+
+    def patch(self, request, pk, format=None):
+        data = {}
+        rapport = self.get_object(pk)
+        data['confirmed'] = False
+        serializer = RapportSignalProbleme_WriteSerializer(rapport, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class RapportSignalChauffeurList(APIView):
     """
     List all RapportSignalChauffeur,Create new RapportSignalChauffeur

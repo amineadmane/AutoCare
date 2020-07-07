@@ -21,7 +21,7 @@ class RapportSignalProbleme(models.Model):
         ('JCP', 'JCP'),
     )
     type_probleme = models.CharField(max_length=30,choices=TYPE_PROBLEME_CHOICES)
-    confirmed = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=None,null=True)
 
 
 

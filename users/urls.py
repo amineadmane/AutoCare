@@ -10,7 +10,7 @@ urlpatterns = [
     path('<int:pk>/', UserDetail.as_view()),
 
     #User Login 
-    path('login/', ObtainAuthToken.as_view()),
+    path('login/', ObtainAuthToken.as_view(), name="login"),
 
     #Admin user create an accounts
     path('adminsign/', AdminSign.as_view()),

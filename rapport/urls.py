@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import (RapportSignalProblemeList, RapportSignalProblemeDetail,
+from .views import (RapportSignalProblemeList, RapportSignalProblemeDetail,InValidateRapportSignalProbleme,ValidateRapportSignalProbleme,
                     RapportSignalChauffeurList, RapportSignalChauffeurDetail,
                     RapportSignalSinistreList, RapportSignalSinistreDetail) 
 
@@ -10,6 +10,11 @@ urlpatterns = [
     path('signalprobleme/', RapportSignalProblemeList.as_view()),
     #GET RapportSignalProbleme detail
     path('signalprobleme/<int:pk>/', RapportSignalProblemeDetail.as_view()),
+
+    #PATCH  VALIDER RapportSignalProbleme 
+    path('signalprobleme/<int:pk>/valider/', ValidateRapportSignalProbleme.as_view()),
+    #PATCH  VALIDER RapportSignalProbleme 
+    path('signalprobleme/<int:pk>/invalider/', InValidateRapportSignalProbleme.as_view()),
 
 
     #GET RapportSignalChauffeur list , POST new RapportSignalChauffeur

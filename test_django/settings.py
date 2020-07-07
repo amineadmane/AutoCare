@@ -180,6 +180,5 @@ CORS_ALLOW_HEADERS = [
 ]
 
 
-
 # Activate Django-Heroku.
 django_heroku.settings(locals())

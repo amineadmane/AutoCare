@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MarqueList,pourcentage_vehicules_per_marque,pourcentage_vehicules_per_modele,pourcentage_conducteurs_per_score, MarqueDetail,ModeleList,ModeleDetail,VehiculeList, ConducteurList, MissionList, VehiculeDetail, ConducteurDetail, MissionDetail
+from .views import stats_etat_vehicules,stats_etat_vehicules_per_modele,MarqueList,pourcentage_vehicules_per_marque,pourcentage_vehicules_per_modele,pourcentage_conducteurs_per_score, MarqueDetail,ModeleList,ModeleDetail,VehiculeList, ConducteurList, MissionList, VehiculeDetail, ConducteurDetail, MissionDetail
 
 urlpatterns = [
 
@@ -38,6 +38,12 @@ urlpatterns = [
     path('stats/vehicule/', pourcentage_vehicules_per_marque),
 
     path('stats/vehicule/<int:marque>/', pourcentage_vehicules_per_modele),
+
+
+    path('stats/vehicule/etats/', stats_etat_vehicules),
+
+    path('stats/vehicule/etats/<int:marque>/', stats_etat_vehicules_per_modele),
+
 
    
 ]
