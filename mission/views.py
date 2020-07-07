@@ -20,6 +20,7 @@ from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
 
+
 class MarqueList(APIView):
     """
     List all marques,Create new marque
@@ -30,13 +31,14 @@ class MarqueList(APIView):
         serializer = MarqueSerializer(marque, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
 
-        serializer=MarqueSerializer(data=request.data)
+        serializer = MarqueSerializer(data=request.data)
         if serializer.is_valid():
-          serializer.save()
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MarqueDetail(APIView):
     """
@@ -61,20 +63,20 @@ class ModeleList(APIView):
     List all Modeles,Create new Modele
     """
 
-
     def get(self, request, format=None):
         modele = Modele.objects.all()
         serializer = ModeleReadSerializer(modele, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
 
-        serializer=ModeleWriteSerializer(data=request.data)
+        serializer = ModeleWriteSerializer(data=request.data)
         if serializer.is_valid():
-          modele = serializer.save()
-          serializer=ModeleReadSerializer(modele)
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            modele = serializer.save()
+            serializer = ModeleReadSerializer(modele)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ModeleDetail(APIView):
     """
@@ -99,16 +101,16 @@ class VehiculeList(APIView):
     List all vehicules,Create new vehicule
     """
 
-    #The request is authenticated
+    # The request is authenticated
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        #CentralUser get all vehicules
+        # CentralUser get all vehicules
         filter = {}
-        #RegionalUser get vehicules of his region
+        # RegionalUser get vehicules of his region
         if request.user.user_type == 2:
             filter['region'] = request.user.region
-        #OperationnelUser get vehicules of his region and his unite
+        # OperationnelUser get vehicules of his region and his unite
         if request.user.user_type == 1:
             filter['region'] = request.user.region
             filter['unite'] = request.user.unite
@@ -117,60 +119,62 @@ class VehiculeList(APIView):
         serializer = VehiculeReadSerializer(vehicules, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['region'] = request.user.region
         data['unite'] = request.user.unite
-        serializer=VehiculeWriteSerializer(data=data)
+        serializer = VehiculeWriteSerializer(data=data)
         if serializer.is_valid():
-          vehicule = serializer.save()
-          serializer=VehiculeReadSerializer(vehicule)
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            vehicule = serializer.save()
+            serializer = VehiculeReadSerializer(vehicule)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class VehiculeDetail(APIView):
     """
     Retrieve, update or delete a vehicule instance.
     """
-    #The request is authenticated
+    # The request is authenticated
     permission_classes = [IsAuthenticated]
 
-    def get_object(self,request,pk):
+    def get_object(self, request, pk):
         try:
-            #CentralUser get all vehicules
+            # CentralUser get all vehicules
             filter = {}
-            #RegionalUser get vehicules of his region
+            # RegionalUser get vehicules of his region
             if request.user.user_type == 2:
                 filter['region'] = request.user.region
-            #OperationnelUser get vehicules of his region and his unite
+            # OperationnelUser get vehicules of his region and his unite
             if request.user.user_type == 1:
                 filter['region'] = request.user.region
                 filter['unite'] = request.user.unite
-            vehicule = Vehicule.objects.get(pk=pk,**filter)
+            vehicule = Vehicule.objects.get(pk=pk, **filter)
             return vehicule
         except Vehicule.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
-        vehicule = self.get_object(request,pk)
+        vehicule = self.get_object(request, pk)
         serializer = VehiculeReadSerializer(vehicule)
         return Response(serializer.data)
+
 
 class ConducteurList(APIView):
     """
     List all conducteurs,Create new conducteur
     """
-    #The request is authenticated
+    # The request is authenticated
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
 
-        #CentralUser get all vehicules
+        # CentralUser get all vehicules
         filter = {}
-        #RegionalUser get conducteurs of his region
+        # RegionalUser get conducteurs of his region
         if request.user.user_type == 2:
             filter['region'] = request.user.region
-        #OperationnelUser get conducteurs of his region and his unite
+        # OperationnelUser get conducteurs of his region and his unite
         if request.user.user_type == 1:
             filter['region'] = request.user.region
             filter['unite'] = request.user.unite
@@ -179,14 +183,14 @@ class ConducteurList(APIView):
         serializer = ConducteurSerializer(conducteurs, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['region'] = request.user.region
         data['unite'] = request.user.unite
-        serializer=ConducteurSerializer(data=data)
+        serializer = ConducteurSerializer(data=data)
         if serializer.is_valid():
-          serializer.save()
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -194,29 +198,34 @@ class ConducteurDetail(APIView):
     """
     Retrieve, update or delete a conducteur instance.
     """
-    #The request is authenticated
+    # The request is authenticated
     permission_classes = [IsAuthenticated]
-    def get_object(self,request,pk):
+
+    def get_object(self, request, pk):
         try:
-            #CentralUser get all vehicules
+            # CentralUser get all vehicules
             filter = {}
-            #RegionalUser get vehicules of his region
+            # RegionalUser get vehicules of his region
             if request.user.user_type == 2:
                 filter['region'] = request.user.region
-            #OperationnelUser get vehicules of his region and his unite
+            # OperationnelUser get vehicules of his region and his unite
             if request.user.user_type == 1:
                 filter['region'] = request.user.region
                 filter['unite'] = request.user.unite
-            conducteur = Conducteur.objects.get(pk=pk,**filter)
+            conducteur = Conducteur.objects.get(pk=pk, **filter)
             return conducteur
         except Conducteur.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
-        conducteur = self.get_object(request,pk)
+        conducteur = self.get_object(request, pk)
         serializer = ConducteurSerializer(conducteur)
         return Response(serializer.data)
 
+    def delete(self, request, pk):
+        conducteur = self.get_object(pk)
+        conducteur.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MissionList(APIView):
@@ -224,8 +233,7 @@ class MissionList(APIView):
     List all Missions,Create new Mission
     """
 
-    
-    #The request is authenticated, or is a read-only request.
+    # The request is authenticated, or is a read-only request.
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, format=None):
@@ -233,19 +241,20 @@ class MissionList(APIView):
         serializer = MissionReadSerializer(mission, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=MissionWriteSerializer(data=data)
+        serializer = MissionWriteSerializer(data=data)
         # vehicule = Vehicule.objects.get(pk=data['vehicule'])
         # conducteur = Vehicule.objects.get(pk=data['conducteur'])
         # if not (vehicule.region == request.user.region and vehicule.unite == request.user.unite and conducteur.region == request.user.region and conducteur.unite == request.user.unite):
         #     return Response({"error": "vehicule ou conducteur n'ont pas la méme region/unite que l'utilisateur"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
-          mission = serializer.save()
-          serializer=MissionReadSerializer(mission)
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            mission = serializer.save()
+            serializer = MissionReadSerializer(mission)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MissionDetail(APIView):
     """
@@ -289,7 +298,7 @@ def pourcentage_conducteurs_per_score(request):
         stats['pourcentage_bon'] = nb_bon * 100 / nb_total_conducteurs 
         stats['pourcentage_moyen'] = nb_moyen * 100 / nb_total_conducteurs
         stats['pourcentage_mauvais'] = nb_mauvais * 100 / nb_total_conducteurs
-        
+
     return Response(stats)
 
 
@@ -309,6 +318,7 @@ def pourcentage_vehicules_per_marque(request):
 
     total_modele = Vehicule.objects.filter(**filter).count()
     stats_modele = Vehicule.objects.filter(**filter).values('modele__marque__id').annotate(marque_nom=F('modele__marque__nom'),nb=Count('*'))
+
     for modele in stats_modele:
         modele['pourcentage'] = modele['nb'] * 100 / total_modele
 
@@ -330,11 +340,9 @@ def pourcentage_vehicules_per_modele(request, marque):
         filter['region'] = request.user.region
         filter['unite'] = request.user.unite
 
-
-
-
     total_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).count()
     stats_modele = Vehicule.objects.filter(**filter).filter(modele__marque=marque).values('modele__id').annotate(modele_nom=F('modele__nom'),nb=Count('*'))
+
     for modele in stats_modele:
         modele['pourcentage'] = modele['nb'] * 100 / total_modele
 
