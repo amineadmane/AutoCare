@@ -2,6 +2,7 @@ import datetime
 import sys
 
 import requests
+from datetime import datetime
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.db.models import F, Max, Sum
@@ -14,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import json
 from rest_framework.views import APIView
-from mission.models import Conducteur, Vehicule
+from mission.models import Conducteur, Vehicule, Mission
 from .models import RapportSignalProbleme, RapportSignalChauffeur, RapportSignalSinistre
 from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
@@ -77,6 +78,17 @@ class ValidateRapportSignalProbleme(APIView):
         serializer = RapportSignalProbleme_WriteSerializer(rapport, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            missions = Mission.objects.filter(vehicule=rapport.vehicule.id)
+            for mission in missions:
+                rapportDate = datetime.strptime(str(rapport.date), "%Y-%m-%d")
+                missionDate = datetime.strptime(str(mission.dateMission), "%Y-%m-%d")
+                diff = abs((rapportDate - missionDate).days)
+                Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 5)
+                #reduce score of "chauffeur" depends on the "gravite"
+                if rapport.gravite == "FAIBLE" or rapport.gravite == "MOYEN":
+                    Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 5)
+                elif rapport.gravite == "FORT" or rapport.gravite == "CRITIQUE":
+                    Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 10)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
