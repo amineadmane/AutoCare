@@ -21,27 +21,36 @@ from .serializers import *
 from .permissions import IsAuthenticatedOrReadOnly
 # Create your views here.
 
+
 class RapportSignalProblemeList(APIView):
     """
     List all RapportSignalProbleme  ,Create new RapportSignalProbleme
     """
-    #The request is authenticated, or is a read-only request.
+    # The request is authenticated, or is a read-only request.
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get(self, request, format=None):
-        rapports = RapportSignalProbleme.objects.all()
-        serializer = RapportSignalProbleme_ReadSerializer(rapports, many=True)
-        return Response(serializer.data)
-
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=RapportSignalProbleme_WriteSerializer(data=data)
+        serializer = RapportSignalProbleme_WriteSerializer(data=data)
         if serializer.is_valid():
-          rapport = serializer.save()
-          serializer = RapportSignalProbleme_ReadSerializer(rapport)
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            rapport = serializer.save()
+            serializer = RapportSignalProbleme_ReadSerializer(rapport)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+
+        # filtrage par modele
+        filter = {}
+
+        if 'vehicule' in request.GET:
+            filter['vehicule'] = request.GET['vehicule']
+
+        rapport = RapportSignalProbleme.objects.filter(**filter)
+        serializer = RapportSignalProbleme_ReadSerializer(rapport, many=True)
+        return Response(serializer.data)
+
 
 class RapportSignalProblemeDetail(APIView):
     """
@@ -70,27 +79,32 @@ class ValidateRapportSignalProbleme(APIView):
         except RapportSignalProbleme.DoesNotExist:
             raise Http404
 
-
     def patch(self, request, pk, format=None):
         data = {}
         rapport = self.get_object(pk)
         data['confirmed'] = True
-        serializer = RapportSignalProbleme_WriteSerializer(rapport, data=data, partial=True)
+        serializer = RapportSignalProbleme_WriteSerializer(
+            rapport, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             missions = Mission.objects.filter(vehicule=rapport.vehicule.id)
             for mission in missions:
                 rapportDate = datetime.strptime(str(rapport.date), "%Y-%m-%d")
-                missionDate = datetime.strptime(str(mission.dateMission), "%Y-%m-%d")
+                missionDate = datetime.strptime(
+                    str(mission.dateMission), "%Y-%m-%d")
                 diff = abs((rapportDate - missionDate).days)
-                Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 5)
-                #reduce score of "chauffeur" depends on the "gravite"
+                Conducteur.objects.filter(
+                    pk=mission.conducteur.id).update(score=F('score') - 5)
+                # reduce score of "chauffeur" depends on the "gravite"
                 if rapport.gravite == "FAIBLE" or rapport.gravite == "MOYEN":
-                    Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 5)
+                    Conducteur.objects.filter(
+                        pk=mission.conducteur.id).update(score=F('score') - 5)
                 elif rapport.gravite == "FORT" or rapport.gravite == "CRITIQUE":
-                    Conducteur.objects.filter(pk=mission.conducteur.id).update(score=F('score') - 10)
+                    Conducteur.objects.filter(
+                        pk=mission.conducteur.id).update(score=F('score') - 10)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class InValidateRapportSignalProbleme(APIView):
 
@@ -101,12 +115,12 @@ class InValidateRapportSignalProbleme(APIView):
         except RapportSignalProbleme.DoesNotExist:
             raise Http404
 
-
     def patch(self, request, pk, format=None):
         data = {}
         rapport = self.get_object(pk)
         data['confirmed'] = False
-        serializer = RapportSignalProbleme_WriteSerializer(rapport, data=data, partial=True)
+        serializer = RapportSignalProbleme_WriteSerializer(
+            rapport, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -117,33 +131,38 @@ class RapportSignalChauffeurList(APIView):
     """
     List all RapportSignalChauffeur,Create new RapportSignalChauffeur
     """
-    #The request is authenticated, or is a read-only request.
+    # The request is authenticated, or is a read-only request.
     permission_classes = [IsAuthenticatedOrReadOnly]
-    
+
     def get(self, request, format=None):
         rapports = RapportSignalChauffeur.objects.all()
         serializer = RapportSignalChauffeur_ReadSerializer(rapports, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=RapportSignalChauffeur_WriteSerializer(data=data)
+        serializer = RapportSignalChauffeur_WriteSerializer(data=data)
         if serializer.is_valid():
-          rapport = serializer.save()
-          serializer=RapportSignalChauffeur_ReadSerializer(rapport)
-          #reduce score of "chauffeur" depends on the "gravite"
-          if data['gravite'] == "FAIBLE":
-              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 5)
-          elif data['gravite'] == "MOYEN":
-              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 10)
-          elif data['gravite'] == "FORT":
-              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 20)
-          elif data['gravite'] == "CRITIQUE":
-              Conducteur.objects.filter(pk=data['conducteur']).update(score=F('score') - 30)
+            rapport = serializer.save()
+            serializer = RapportSignalChauffeur_ReadSerializer(rapport)
+            # reduce score of "chauffeur" depends on the "gravite"
+            if data['gravite'] == "FAIBLE":
+                Conducteur.objects.filter(
+                    pk=data['conducteur']).update(score=F('score') - 5)
+            elif data['gravite'] == "MOYEN":
+                Conducteur.objects.filter(
+                    pk=data['conducteur']).update(score=F('score') - 10)
+            elif data['gravite'] == "FORT":
+                Conducteur.objects.filter(
+                    pk=data['conducteur']).update(score=F('score') - 20)
+            elif data['gravite'] == "CRITIQUE":
+                Conducteur.objects.filter(
+                    pk=data['conducteur']).update(score=F('score') - 30)
 
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RapportSignalChauffeurDetail(APIView):
     """
@@ -163,39 +182,34 @@ class RapportSignalChauffeurDetail(APIView):
         return Response(serializer.data)
 
 
-
-
-
-
-
 class RapportSignalSinistreList(APIView):
     """
     List all RapportSignalSinistre,Create new RapportSignalSinistre
     """
 
-    #The request is authenticated, or is a read-only request.
+    # The request is authenticated, or is a read-only request.
     permission_classes = [IsAuthenticatedOrReadOnly]
-    
 
     def get(self, request, format=None):
         rapports = RapportSignalSinistre.objects.all()
         serializer = RapportSignalSinistre_ReadSerializer(rapports, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
+    def post(self, request):
         data = request.data.copy()
         data['redacteur'] = request.user.id
-        serializer=RapportSignalSinistre_WriteSerializer(data=data)
+        serializer = RapportSignalSinistre_WriteSerializer(data=data)
         if serializer.is_valid():
-          rapport = serializer.save()
-          serializer = RapportSignalSinistre_ReadSerializer(rapport)
-        
-          #critique ==> vehicule etat == hds
-          if data['gravite'] == "CRITIQUE":
-              Vehicule.objects.filter(pk=data['vehicule']).update(etat="HDS")
+            rapport = serializer.save()
+            serializer = RapportSignalSinistre_ReadSerializer(rapport)
 
-          return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # critique ==> vehicule etat == hds
+            if data['gravite'] == "CRITIQUE":
+                Vehicule.objects.filter(pk=data['vehicule']).update(etat="HDS")
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class RapportSignalSinistreDetail(APIView):
     """
@@ -213,5 +227,3 @@ class RapportSignalSinistreDetail(APIView):
         rapport = self.get_object(pk)
         serializer = RapportSignalSinistre_ReadSerializer(rapport)
         return Response(serializer.data)
-
-
