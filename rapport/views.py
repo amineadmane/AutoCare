@@ -39,17 +39,17 @@ class RapportSignalProblemeList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, format=None):
+     def get(self, request, format=None):
 
-        # filtrage par modele
+        # filtrage par modele 
         filter = {}
 
-        if 'vehicule' in request.GET:
+        if 'modele' in request.GET:
             filter['vehicule'] = request.GET['vehicule']
 
-        rapport = RapportSignalProbleme.objects.filter(**filter)
-        serializer = RapportSignalProbleme_ReadSerializer(rapport, many=True)
-        return Response(serializer.data)
+        pieces = RapportSignalProbleme.objects.filter(**filter)
+        serializer = RapportSignalProbleme_ReadSerializer(pieces, many=True)
+        return Response(serializer.data
 
 
 class RapportSignalProblemeDetail(APIView):
